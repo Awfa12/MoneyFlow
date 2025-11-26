@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # PHP-FPM Service
+  # This is where your Laravel application runs
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: moneyflow_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini
+    networks:
+      - moneyflow_network
+
+  # Nginx Service
+  # This receives HTTP requests and forwards them to PHP-FPM
+  nginx:
+    image: nginx:alpine
+    container_name: moneyflow_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - moneyflow_network
+
+  # MySQL Database Service
+  # CRITICAL: Must use InnoDB engine for transactions and row-level locking
+  mysql:
+    image: mysql:8.0
+    container_name: moneyflow_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: moneyflow
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: moneyflow_user
+      MYSQL_PASSWORD: moneyflow_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # This ensures InnoDB is the default engine
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf
+    networks:
+      - moneyflow_network
+
+  # Redis Service
+  # Used by Laravel for sessions, cache, and queues
+  redis:
+    image: redis:7-alpine
+    container_name: moneyflow_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - moneyflow_network
+
+  # Mailpit Service
+  # Catches all emails in development - access at http://localhost:8025
+  mailpit:
+    image: axllent/mailpit
+    container_name: moneyflow_mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025"  # SMTP port
+      - "8025:8025"  # Web interface
+    networks:
+      - moneyflow_network
+
+# Named volumes persist data even when containers are removed
+volumes:
+  mysql_data:
+    driver: local
+
+# Network allows all services to communicate using service names
+networks:
+  moneyflow_network:
+    driver: bridge
+
