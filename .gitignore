@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Ignore all markdown documentation files
+*.md
+!README.md

@@ -78,6 +78,63 @@ Building a peer-to-peer money transfer API similar to Tikkie/Venmo with Laravel,
 
 ---
 
+### 🗄️ Week 1 - Day 3: Database Migrations (COMPLETED)
+
+-   [x] Create wallets table migration
+    -   [x] Design schema (id, user_id, balance DECIMAL(10,2), currency)
+    -   [x] Add foreign key constraint to users table
+    -   [x] Add indexes for performance
+-   [x] Create transactions table migration
+    -   [x] Design schema (id, uuid, sender_wallet_id, recipient_wallet_id, amount, status, description)
+    -   [x] Add foreign keys and indexes
+    -   [x] Understand UUID for idempotency
+-   [x] Run migrations successfully
+-   [x] Tables created in database (wallets and transactions)
+
+**Key Files Created:**
+
+-   `database/migrations/2025_11_27_004010_create_wallets_table.php` - Wallets table schema
+-   `database/migrations/2025_11_27_004659_create_transactions_table.php` - Transactions table schema
+
+**Learning Points:**
+
+-   ✅ DECIMAL(10,2) for money (never use FLOAT/DOUBLE)
+-   ✅ Foreign key constraints with cascade delete
+-   ✅ Indexes for query performance (user_id, sender_wallet_id, recipient_wallet_id, status)
+-   ✅ UUID field for idempotency (prevents duplicate transaction processing)
+-   ✅ Enum field for transaction status (pending, completed, failed)
+-   ✅ Database schema design principles
+
+### 👁️ Week 1 - Day 2: Wallet Creation with Observers (COMPLETED)
+
+-   [x] Understand the Observer pattern concept
+-   [x] Create UserObserver class
+-   [x] Implement automatic wallet creation on user registration
+-   [x] Register observer in Laravel service provider
+-   [x] Test wallet auto-creation successfully
+
+**Key Files Created/Modified:**
+
+-   `app/Models/Wallet.php` - Wallet model with fillable fields
+-   `app/Observers/UserObserver.php` - Observer that creates wallet on user creation
+-   `app/Providers/AppServiceProvider.php` - Registered UserObserver
+
+**Learning Points:**
+
+-   ✅ Observer pattern - automatic event handling
+-   ✅ Laravel model events (created, updated, deleted)
+-   ✅ Centralized logic for automatic wallet creation
+-   ✅ Service provider boot() method for registering observers
+-   ✅ Separation of concerns (observer handles side effects)
+
+**How It Works:**
+
+-   When a user is created → Observer fires automatically
+-   Observer creates a wallet with balance 0.00 EUR
+-   Works everywhere (API, commands, seeders)
+
+---
+
 ## 🔄 In Progress
 
 _Nothing currently in progress_
@@ -85,27 +142,6 @@ _Nothing currently in progress_
 ---
 
 ## 📋 Upcoming Tasks
-
-### Week 1 - Day 2: Wallet Creation with Observers
-
--   [ ] Understand the Observer pattern concept
--   [ ] Create UserObserver class
--   [ ] Implement automatic wallet creation on user registration
--   [ ] Register observer in Laravel service provider
--   [ ] Test wallet auto-creation
-
-### Week 1 - Day 3: Database Migrations
-
--   [ ] Create wallets table migration
-    -   [ ] Design schema (id, user_id, balance DECIMAL(10,2), currency)
-    -   [ ] Add foreign key constraint to users table
-    -   [ ] Add indexes for performance
--   [ ] Create transactions table migration
-    -   [ ] Design schema (id, uuid, sender_wallet_id, recipient_wallet_id, amount, status, description)
-    -   [ ] Add foreign keys and indexes
-    -   [ ] Understand UUID for idempotency
--   [ ] Run migrations
--   [ ] Verify table structure in database
 
 ### Week 1 - Day 4: Model Relationships
 
@@ -143,6 +179,9 @@ _Nothing currently in progress_
 -   Sanctum authentication
 -   Request validation
 -   Controllers and routing
+-   Database migrations and schema design
+-   Observer pattern for model events
+-   Service providers and boot() method
 
 ### Security & Best Practices
 
@@ -194,12 +233,14 @@ docker-compose exec app bash
 
 ## 🎯 Next Session Goal
 
-**Start Day 3: Database Migrations**
+**Start Day 4: Model Relationships**
 
--   Create wallets table
--   Create transactions table
--   Understand schema design decisions
+-   Define User → Wallet relationship (hasOne)
+-   Define Wallet → User relationship (belongsTo)
+-   Define Transaction relationships
+-   Install Pest PHP testing framework
+-   Write first test
 
 ---
 
-_Last Updated: After Day 1 - Authentication Setup_
+_Last Updated: After Day 2 - Wallet Creation with Observers_
